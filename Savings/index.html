@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savings Master</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1><i class="fas fa-piggy-bank"></i> Savings Master</h1>
+            <div class="header-actions">
+                <button id="themeToggle" aria-label="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="newSavingBtn" aria-label="Add new goal">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <section class="stats-summary">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-bullseye"></i></div>
+                    <div class="stat-info">
+                        <h3 id="totalGoals">0</h3>
+                        <p>Total Goals</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="stat-info">
+                        <h3 id="totalSaved">$0</h3>
+                        <p>Total Saved</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                    <div class="stat-info">
+                        <h3 id="completedGoals">0</h3>
+                        <p>Completed</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="toolbar">
+                <h2>Your Savings Goals</h2>
+                <div class="controls">
+                    <select id="filterCategory">
+                        <option value="all">All Categories</option>
+                        <option value="general">General</option>
+                        <option value="travel">Travel</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="education">Education</option>
+                    </select>
+                    <select id="sortBy">
+                        <option value="date-desc">Newest First</option>
+                        <option value="progress-desc">Progress High</option>
+                        <option value="target-desc">Target High</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="empty-state" id="emptyState">
+                <i class="fas fa-coins"></i>
+                <h3>No savings goals yet</h3>
+                <p>Start by creating your first savings goal</p>
+                <button id="createFirstGoalBtn">Create Goal</button>
+            </div>
+
+            <div class="savings-container" id="savingsContainer"></div>
+        </main>
+
+        <!-- All Modals -->
+        <div class="modal-overlay" id="modalOverlay"></div>
+        
+        <!-- Add/Edit Modal -->
+        <div class="modal" id="savingModal">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Goal</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="savingForm">
+                    <input type="text" id="savingName" placeholder="Goal name" required>
+                    <div class="form-row">
+                        <input type="number" id="targetAmount" placeholder="Target ($)" min="1" required>
+                        <input type="number" id="currentAmount" placeholder="Saved ($)" min="0" required>
+                    </div>
+                    <select id="category">
+                        <option value="general">General</option>
+                        <option value="travel">Travel</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="education">Education</option>
+                    </select>
+                    <textarea id="notes" placeholder="Notes (optional)"></textarea>
+                    <div class="form-actions">
+                        <button type="button" id="cancelBtn">Cancel</button>
+                        <button type="submit" id="saveBtn">Save Goal</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Delete Modal -->
+        <div class="modal" id="deleteModal">
+            <div class="modal-header">
+                <h2>Delete Goal</h2>
+                <button class="modal-close" id="deleteModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p id="deleteMessage">Are you sure?</p>
+                <div class="form-actions">
+                    <button type="button" id="cancelDeleteBtn">Cancel</button>
+                    <button type="button" id="confirmDeleteBtn" class="btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Money Modal -->
+        <div class="modal" id="addMoneyModal">
+            <div class="modal-header">
+                <h2 id="addMoneyTitle">Add Money</h2>
+                <button class="modal-close" id="addMoneyModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="quick-add">
+                    <button data-amount="10">$10</button>
+                    <button data-amount="50">$50</button>
+                    <button data-amount="100">$100</button>
+                </div>
+                <input type="number" id="addMoneyAmount" placeholder="Amount" min="0.01" step="0.01">
+                <div class="form-actions">
+                    <button type="button" id="cancelAddMoneyBtn">Cancel</button>
+                    <button type="button" id="confirmAddMoneyBtn">Add Money</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- BACKGROUND CUSTOMIZATION MODAL -->
+        <div class="modal" id="backgroundModal">
+            <div class="modal-header">
+                <h2>Customize Background</h2>
+                <button class="modal-close" id="backgroundModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="customize-tabs">
+                    <button class="tab-btn active" data-tab="color">Color</button>
+                    <button class="tab-btn" data-tab="image">Image</button>
+                </div>
+                
+                <div class="tab-content active" id="colorTab">
+                    <p>Choose a color:</p>
+                    <div class="color-grid" id="colorGrid">
+                        <div class="color-option" data-color="#2ecc71" style="background:#2ecc71;"></div>
+                        <div class="color-option" data-color="#3498db" style="background:#3498db;"></div>
+                        <div class="color-option" data-color="#9b59b6" style="background:#9b59b6;"></div>
+                        <div class="color-option" data-color="#e74c3c" style="background:#e74c3c;"></div>
+                        <div class="color-option" data-color="#f39c12" style="background:#f39c12;"></div>
+                        <div class="color-option" data-color="#1abc9c" style="background:#1abc9c;"></div>
+                        <div class="color-option" data-color="#34495e" style="background:#34495e;"></div>
+                        <div class="color-option" data-color="#e67e22" style="background:#e67e22;"></div>
+                        <div class="color-option" data-color="#27ae60" style="background:#27ae60;"></div>
+                        <div class="color-option" data-color="#8e44ad" style="background:#8e44ad;"></div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="imageTab">
+                    <p>Upload an image:</p>
+                    <div class="image-upload-area" id="imageUploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload or drag & drop</p>
+                        <p class="upload-hint">JPG, PNG up to 2MB</p>
+                        <input type="file" id="imageUpload" accept="image/*" style="display:none;">
+                    </div>
+                    <div class="image-preview" id="imagePreview" style="display:none;">
+                        <img id="previewImage" src="" alt="Preview">
+                        <button type="button" class="remove-image">Remove Image</button>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" id="cancelBackgroundBtn">Cancel</button>
+                    <button type="button" id="saveBackgroundBtn">Save Background</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
